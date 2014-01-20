@@ -1,7 +1,79 @@
 <?php
+/*Voting count schema*/
+function simplepoll_schema() {
+  $schema['simplepoll'] = array(
+    
+    'description' => 'The base table for nodes.',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+     /* 'vid' => array(
+        'description' => 'The current {node_revision}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),*/
+
+      'fieldname' => array(
+        'description' => 'The field for this poll.',
+        'type' => 'varchar',
+        'length' => 90,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'delta' => array(
+        'description' => 'The number of question.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+   
+      ),
+      'question' => array(
+        'description' => 'The number of response.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+   
+      ),
+      'qty' => array(
+        'description' => 'Votes Qty',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+   
+      ),
+    ),
+    /*'indexes' => array(
+      'node_changed' => array('changed'),
+      'node_created' => array('created'),
+    ),*/
+    'unique keys' => array(
+      'pollquestion' => array('nid', 'fieldname','delta','question'),
+    ),
+    /*'foreign keys' => array(
+      'node_revision' => array(
+        'table' => 'node_revision',
+        'columns' => array('vid' => 'vid'),
+      ),
+      'node_author' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),*/
+    //'primary key' => array('pollquestion'),
+  );
+  return $schema;
+}
+
+/*Field Schema*/
 function simplepoll_field_schema($field) {
   $columns = array(
-    //'material_name' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+    
     'simplepoll_question' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
     'simplepoll_option_1' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
     'simplepoll_option_2' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),

@@ -10,5 +10,17 @@
 
 
 	?>
-	<input type="submit" value="Enviar">
+
+	<pre><?php 
+
+			print 'Entidad:'.$entityID.'<br>';
+			print 'Campo:'.$fieldName.'<br>';
+			print 'Delta:'.($fieldDelta +1).'/ '.$totalPolls; ?>
+	</pre>
+<?php 
+	if(($fieldDelta +1)==$totalPolls){
+		print '<input type="submit" value="Enviar">';
+	}	
+ ?>
+
 </form>
