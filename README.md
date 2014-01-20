@@ -1,0 +1,4 @@
+mypoll
+======
+My Drupal 7 Poll field version. For creating polls as field.
+See the demo at: 
