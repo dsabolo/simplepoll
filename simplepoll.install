@@ -1,0 +1,12 @@
+<?php
+function simplepoll_field_schema($field) {
+  $columns = array(
+    //'material_name' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+    'simplepoll_question' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+  );
+
+  return array(
+    'columns' => $columns,
+    'indexes' => array(),
+  );
+}

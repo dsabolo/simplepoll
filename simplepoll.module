@@ -1,0 +1,235 @@
+<?php
+
+/**
+* Implements hook_field_info().
+*
+* Here we tell Drupal about our custom fields. In this case
+* we only have one. Its machine-readable name is 'simplepoll_question'
+* because the convention is 'modulename_fieldname'.
+*
+* We also define the machine names of the widget and the formatter.
+*/
+function simplepoll_field_info() {
+  return array(
+    'simplepoll_question' => array(
+      'label' => t('Simple Poll'),
+      'description' => t('Poll Field'),
+      'default_widget' => 'simplepoll_widget',
+      'default_formatter' => 'simplepoll_formatter',
+    ),
+  );
+}
+
+/**
+* Implements hook_field_widget_info().
+*
+* Here we tell Drupal about our custom widgets. In this
+* case we only have one. As with simplepoll_field_formatter_info(),
+* we tell Drupal which fields our widget works with (in this case, just
+* 'simplepoll_question').
+*/
+function simplepoll_field_widget_info() {
+  return array(
+    'simplepoll_widget' => array(
+      'label' => t('Default'),
+      'field types' => array('simplepoll_question'),
+    ),
+  );
+}
+
+
+
+/**
+* Implements hook_field_widget_form().
+*
+* http://api.drupal.org/api/drupal/modules--field--field.api.php/function/hook_field_widget_form/7
+*
+* Here we define a form element that the user inputs data
+* into. If we have a complex custom field, we can have many sub-elements
+* organized into fieldsets.
+*/
+function simplepoll_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // $field_name is the name of the field instance. This is the
+  // name that the administrator gives the field instance when
+  // attaching it to an entity.
+  $field_name = $instance['field_name'];
+  $required = $element['#required'];
+
+  // $item is where the current saved values are stored
+  $item =& $items[$delta];
+
+  // $element is already populated with #title, #description, #delta,
+  // #required, #field_name, etc.
+
+  // Array keys in $element correspond roughly
+  // to array keys in $item, which correspond
+  // roughly to columns in the database table.
+  
+  $element['simplepoll_question'] = array(
+    '#title' => t('Text'),
+    '#type' => 'textfield',
+    //'#required' => $required,
+    '#default_value' => isset($item['simplepoll_question']) ? $item['simplepoll_question'] : '',
+  );  
+
+  return $element;
+}
+
+
+
+/**
+* Implements hook_field_is_empty().
+*
+* simplepoll_field_is_empty() lets Drupal know whether or not to process input
+* at all; if the field is empty, it won't bother validating
+* or saving the values.
+*/
+function simplepoll_field_is_empty($item, $field) {
+  $has_stuff = FALSE;
+
+ 
+  if (!empty($item['simplepoll_question'])) {
+    $has_stuff = TRUE;
+  }
+
+  return !$has_stuff;
+}
+
+/**
+* Implements hook_field_validate().
+*
+* simplepoll_field_validate() sets an $errors array with information about
+* the errors detected in the field input.
+*/
+function simplepoll_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  /*foreach ($items as $delta => $item) {
+    if (isset($item['sweet_potato']) && isset($item['tofu']) && $item['sweet_potato'] == 1 && $item['tofu'] == 1) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'simplepoll_invalid_full',
+        'message' => t('%title: Your poutine is not tasty. Please do not mix sweet potato and tofu.', array('%title' => $instance['label'])),
+      );
+    }
+  }*/
+}
+
+/**
+* Implements hook_field_widget_error().
+*
+* simplepoll_field_widget_error() takes the errors set in simplepoll_field_validate()
+* and tells Drupal how to notify the user of the error. For example, this implementation
+* calls form_error() with each element passed in the $error['error_elements'] array, so
+* we can identify a problem with several elements in our field (e.g. tofu and sweet potato).
+*/
+function simplepoll_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+      // Handle the error that was set in simplepoll_field_validate()
+      case 'simplepoll_invalid_full':
+        form_error($element, $error['message']);
+        break;
+  }
+}
+
+/**
+* Implements hook_field_formatter_info().
+*
+* Here we tell Drupal about our custom formatters. In this
+* case we only have one. Note that our formatter works on
+* the field type 'simplepoll_question', which is
+* the machine-readable name we defined in simplepoll_field_info().
+*/
+function simplepoll_field_formatter_info() {
+  return array(
+    'simplepoll_formatter' => array(
+      'label' => t('Default'),
+      'field types' => array('simplepoll_question'),
+    ),
+  );
+}
+
+/**
+* Implements hook_field_formatter_view().
+*
+* This function gives Drupal a structured array, which
+* defines how the data stored in the field should be rendered.
+*/
+function simplepoll_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+  case 'simplepoll_formatter':
+    $format_field = 'simplepoll_format_default_field';
+    break;
+  }
+
+  foreach ($items as $delta => $item) {
+//    $element[$delta] = $format_field($item);
+    $element[$delta] = array(
+      '#theme' => 'simplepoll_view', 
+      
+      '#simplepoll_question' => $item['simplepoll_question'], 
+    );    
+  }
+
+  return $element;
+}
+
+/**
+* Helper to render a single formatted entry. Returns
+* a structured array that will display the data stored in
+* $item.
+*/
+
+function simplepoll_format_default_field($item) {
+  $element = array(
+    '#type' => 'container',
+    '#attributes' => array( 'class' => array( 'field-item') ),
+  );
+  
+  return $element;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function simplepoll_theme() {
+  return array(        
+    'simplepoll_view' => array(
+      'template' => 'simplepoll_view',
+        'variables' => array(
+          'simplepoll_question' => NULL,
+        ),
+    )
+  );
+}
+
+/**
+* Implements hook_field_presave().
+*/
+function simplepoll_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'simplepoll_question') {
+   
+    
+    foreach ($items as $delta => &$item) {
+      $new_item = array();
+     
+      $new_item['simplepoll_question'] = $item['simplepoll_question'];
+      $item = $new_item;
+   
+    }
+  }
+}
+
+/**
+* Implements hook_field_load().
+*/
+function simplepoll_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => &$item) {
+      $new_item = array();
+     
+      $new_item['simplepoll_question'] = $item['simplepoll_question'];
+      $item = $new_item;
+    }
+  }
+}
+
