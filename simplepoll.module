@@ -64,7 +64,7 @@ function simplepoll_field_widget_form(&$form, &$form_state, $field, $instance, $
   // Array keys in $element correspond roughly
   // to array keys in $item, which correspond
   // roughly to columns in the database table.
-   drupal_add_css(drupal_get_path('module', 'simplepoll') .'/css/simplepollbackend.css');
+//');
   $element['simplepoll_question'] = array(
     '#title' => t('Poll Title'),
     '#type' => 'textfield',
@@ -197,6 +197,7 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
      $choiceForm['choice'.$delta] = array(
 	  	'#type' => 'radios',
 	  	'#title' => $item['simplepoll_question'],
+      '#required' => true,
 	  	'#options' => array_filter(array(
 	  		$item['simplepoll_option_1'],
 	  		$item['simplepoll_option_2'],
@@ -209,7 +210,7 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
 
 
     if(($delta+1)==count($items)){
-    	$theForm = drupal_get_form('simplepoll_votingform',$choiceForm,count($items));
+    	$theForm = drupal_get_form('simplepoll_votingform',$choiceForm,count($items),$entity->nid);
     	$theForm = drupal_render($theForm);
     	$elements[0]=array(
     		'#theme' => 'simplepoll_view',
@@ -330,18 +331,26 @@ function page_simplepoll_vote_saving(){
 
 
 
-function simplepoll_votingform($form,&$form_state,$choiceForm,$totalPolls) {
+function simplepoll_votingform($form,&$form_state,$choiceForm,$totalPolls,$nid) {
   foreach (array_keys($choiceForm) as $key ) {
   	$form[$key]=$choiceForm[$key];
   }
 
-  //$form['actions'] = array('#type' => 'actions');
-  $form['#action'] = url('simplepoll');
+
   $form['totalQuestion'] = array('#type' => 'hidden', '#value' => $totalPolls);
-  $form['actions']['submit'] = array(
+  $form['pollNid'] = array('#type' => 'hidden', '#value' => $nid);
+  $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Send'),
+    '#ajax' => array(
+      'callback' => 'simplepoll_validate',
+      'wrapper' => 'simplepoll-votingform',
+      //'method' => 'replace',
+      'effect' => 'fade',
+
+    ),
   );
+  
  
   
     return $form;
@@ -350,4 +359,32 @@ function simplepoll_votingform($form,&$form_state,$choiceForm,$totalPolls) {
 function hasValue($var)
 {
     if($var !=""){return $var;}
+}
+/*Non Ajax*/
+function simplepoll_page(){
+  return "hola no ajax";
+  die();
+}
+
+/*Ajax*/
+function simplepoll_validate($form, $form_state){
+
+  $error = false;
+  $totalQuestion = $_POST['totalQuestion'];
+  $pollNid = $_POST['pollNid'];
+  for($i=0;$i<$totalQuestion;$i++){
+    if($_POST['choice'.$i]==""){
+      $error  = true;
+    }
+    $choices.=$_POST['choice'.$i];
+  }
+  if($error){
+    drupal_set_message('Debes completar toda la encuesta','error');
+    
+    return $drupal_render($form);
+  }
+  else {
+    //drupal_set_message('Debes completar toda la encuesta','error');
+    return "Muchas Gracias";
+  }
 }
