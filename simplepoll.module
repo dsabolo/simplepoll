@@ -1,5 +1,4 @@
 <?php
-
 /**
 * Implements hook_field_info().
 *
@@ -164,6 +163,7 @@ function simplepoll_field_formatter_info() {
 */
 function simplepoll_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
+ drupal_add_js(drupal_get_path('module', 'simplepoll') .'/js/simplepoll.js');
 
   switch ($display['type']) {
   case 'simplepoll_formatter':
@@ -270,3 +270,41 @@ function simplepoll_field_load($entity_type, $entities, $field, $instances, $lan
   }
 }
 
+/*Saving votes*/
+function simplepoll_permissions(){
+	 return array(
+    'participate in polls' => array(
+      'title' => t('Participate in voting on polls'),
+      'description' => t('let´s user to select a choice in polls.'),
+    ),
+  );
+}
+function simplepoll_menu() {
+    $items['simplepoll'] = array(
+     'title' => 'Simple - no arguments',
+    'page callback' => 'page_simplepoll_vote_saving',
+    'access arguments' => array('participate in polls')
+       );
+    return $items;
+  }
+
+function page_simplepoll_vote_saving(){
+	print_r($_POST);
+	return array('#markup' => '<p>' . t('Simple page: The quick brown fox jumps over the lazy dog.') . '</p>');
+}
+
+
+
+function simplepoll_votingform($form, &$form_state) {
+
+  $form['description'] = array(
+    '#type' => 'item',
+    '#title' => t('A form with nothing but a textfield'),
+  );
+  // This is the first form element. It's a textfield with a label, "Name"
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+  );
+  return $form;
+}

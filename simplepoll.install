@@ -87,3 +87,8 @@ function simplepoll_field_schema($field) {
     'indexes' => array(),
   );
 }
+
+
+
+
+
