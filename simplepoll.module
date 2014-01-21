@@ -1,12 +1,6 @@
 <?php
 /**
 * Implements hook_field_info().
-*
-* Here we tell Drupal about our custom fields. In this case
-* we only have one. Its machine-readable name is 'simplepoll_question'
-* because the convention is 'modulename_fieldname'.
-*
-* We also define the machine names of the widget and the formatter.
 */
 function simplepoll_field_info() {
   return array(
