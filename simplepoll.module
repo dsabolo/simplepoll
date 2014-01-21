@@ -178,22 +178,7 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
 
   $choiceForm =array();
   foreach ($items as $delta => $item) {
-//    $element[$delta] = $format_field($item);
-   /* $element[$delta] = array(
-      '#theme' => 'simplepoll_view', 
-      '#fieldName' => $instance['field_name'],	
-      '#fieldDelta' => $delta,
-      '#entityID' => $entity->nid,
-      '#totalPolls' => count($items),
-      '#simplepoll_question' => $item['simplepoll_question'],
-      '#simplepoll_option_1' => $item['simplepoll_option_1'], 
-      '#simplepoll_option_2' => $item['simplepoll_option_2'],
-      '#simplepoll_option_3' => $item['simplepoll_option_3'],
-      '#simplepoll_option_4' => $item['simplepoll_option_4'],
-      '#simplepoll_option_5' => $item['simplepoll_option_5'],
-  	  '#poll'=>$arrForm,	
-    );*/
-     
+
      $choiceForm['choice'.$delta] = array(
 	  	'#type' => 'radios',
 	  	'#title' => $item['simplepoll_question'],
@@ -207,15 +192,25 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
 	  		), 'hasValue')
 	  	);
 
-
+     
 
     if(($delta+1)==count($items)){
     	$theForm = drupal_get_form('simplepoll_votingform',$choiceForm,count($items),$entity->nid);
     	$theForm = drupal_render($theForm);
-    	$elements[0]=array(
-    		'#theme' => 'simplepoll_view',
-    		'#poll'=>$theForm,	
-    		);
+    	//TODO: Mostrar form o 403 (Perm: participate in polls) o mensaje de ya completado.
+      if(user_access('participate in polls')){
+        $elements[0]=array(
+        '#theme' => 'simplepoll_view',
+        '#poll'=>$theForm,  
+        );
+      }
+      else {
+        $elements[0]=array(
+        '#theme' => 'simplepoll_view_403',
+        '#poll'=>$theForm,  
+        );
+      }
+      
     }    
   }
   return $elements;
@@ -239,24 +234,21 @@ function simplepoll_format_default_field($item) {
  * Implements hook_theme().
  */
 function simplepoll_theme() {
-  return array(        
+     return array(        
     'simplepoll_view' => array(
       'template' => 'simplepoll_view',
         'variables' => array(
-        /*  'fieldName'=> NULL,
-          'fieldDelta'=> NULL,
-          'entityID' =>NULL,
-          'totalPolls'=> NULL,
-          'simplepoll_question' => NULL,
-          'simplepoll_option_1' => NULL,
-          'simplepoll_option_2' => NULL,
-          'simplepoll_option_3' => NULL,
-          'simplepoll_option_4' => NULL,
-          'simplepoll_option_5' => NULL,*/
           'poll' => NULL,
         ),
+    ),
+    'simplepoll_view_403' => array(
+      'template' => 'simplepoll_view_403',
+        'variables' => array(
+         // 'poll' => NULL,
+        ),
     )
-  );
+    );
+  
 }
 
 /**
@@ -302,7 +294,7 @@ function simplepoll_field_load($entity_type, $entities, $field, $instances, $lan
 }
 
 /*Saving votes*/
-function simplepoll_permissions(){
+function simplepoll_permission(){
 	 return array(
     'participate in polls' =>
 			array(
@@ -381,10 +373,16 @@ function simplepoll_validate($form, $form_state){
   if($error){
     drupal_set_message('Debes completar toda la encuesta','error');
     
-    return $drupal_render($form);
+    return drupal_render($form);
   }
   else {
-    //drupal_set_message('Debes completar toda la encuesta','error');
-    return "Muchas Gracias";
+
+    //TODO: Guardar resultados.
+
+    //TODO: Exponer Data Actual.
+
+    //TODO: Mostra mensaje de salida.
+
+    return t("Thank you");
   }
 }
