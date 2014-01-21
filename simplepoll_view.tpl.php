@@ -1,7 +1,6 @@
-<h2> <?php echo $simplepoll_question; ?></h2>
 
 	<?php 
-
+/*
 if($fieldDelta ==0 ){
 	print '<form action="'.base_path().'simplepoll" method="POST">';
 }		
@@ -29,10 +28,9 @@ if($fieldDelta ==0 ){
 		print '<input type="submit" value="Enviar">';
 		print '<form>';
 	}	
+*/
 
-
-	$arrForm = drupal_get_form('simplepoll_votingform');
-	 print drupal_render($arrForm);
+	print $poll;
  ?>
 
 

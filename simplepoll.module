@@ -10,7 +10,8 @@
 */
 function simplepoll_field_info() {
   return array(
-    'simplepoll_question' => array(
+    'simplepoll_question' =>
+array(
       'label' => t('Simple Poll'),
       'description' => t('Poll Field'),
       'default_widget' => 'simplepoll_widget',
@@ -71,9 +72,11 @@ function simplepoll_field_widget_form(&$form, &$form_state, $field, $instance, $
     '#default_value' => isset($item['simplepoll_question']) ? $item['simplepoll_question'] : '',
   );  
 
-  for($i=1;$i<=5;$i++){
+  for($i=1;$i
+<=5;$i++){
 	  	$element['simplepoll_option_'.$i] = array(
-	    '#title' => t('Option #').$i,
+	    '#title' =>
+	t('Option #').$i,
 	    '#type' => 'textfield',
 	    //'#required' => $required,
 	    '#default_value' => isset($item['simplepoll_option_'.$i]) ? $item['simplepoll_option_'.$i] : '',
@@ -171,9 +174,11 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
     break;
   }
 
+
+  $choiceForm =array();
   foreach ($items as $delta => $item) {
 //    $element[$delta] = $format_field($item);
-    $element[$delta] = array(
+   /* $element[$delta] = array(
       '#theme' => 'simplepoll_view', 
       '#fieldName' => $instance['field_name'],	
       '#fieldDelta' => $delta,
@@ -185,11 +190,33 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
       '#simplepoll_option_3' => $item['simplepoll_option_3'],
       '#simplepoll_option_4' => $item['simplepoll_option_4'],
       '#simplepoll_option_5' => $item['simplepoll_option_5'],
-  		
-    );    
-  }
+  	  '#poll'=>$arrForm,	
+    );*/
+     
+     $choiceForm['choice'.$delta] = array(
+	  	'#type' => 'radios',
+	  	'#title' => $item['simplepoll_question'],
+	  	'#options' => array_filter(array(
+	  		$item['simplepoll_option_1'],
+	  		$item['simplepoll_option_2'],
+	  		$item['simplepoll_option_3'],
+	  		$item['simplepoll_option_4'],
+	  		$item['simplepoll_option_5']
+	  		), 'tieneValor')
+	  	);
 
-  return $element;
+
+
+    if(($delta+1)==count($items)){
+    	$theForm = drupal_get_form('simplepoll_votingform',$choiceForm,count($items));
+    	$theForm = drupal_render($theForm);
+    	$elements[0]=array(
+    		'#theme' => 'simplepoll_view',
+    		'#poll'=>$theForm,	
+    		);
+    }    
+  }
+  return $elements;
 }
 
 /**
@@ -203,7 +230,6 @@ function simplepoll_format_default_field($item) {
     '#type' => 'container',
     '#attributes' => array( 'class' => array( 'field-item') ),
   );
-  
   return $element;
 }
 
@@ -215,7 +241,7 @@ function simplepoll_theme() {
     'simplepoll_view' => array(
       'template' => 'simplepoll_view',
         'variables' => array(
-          'fieldName'=> NULL,
+        /*  'fieldName'=> NULL,
           'fieldDelta'=> NULL,
           'entityID' =>NULL,
           'totalPolls'=> NULL,
@@ -224,8 +250,8 @@ function simplepoll_theme() {
           'simplepoll_option_2' => NULL,
           'simplepoll_option_3' => NULL,
           'simplepoll_option_4' => NULL,
-          'simplepoll_option_5' => NULL,
-          
+          'simplepoll_option_5' => NULL,*/
+          'poll' => NULL,
         ),
     )
   );
@@ -242,7 +268,8 @@ function simplepoll_field_presave($entity_type, $entity, $field, $instance, $lan
       $new_item = array();
      
       $new_item['simplepoll_question'] = $item['simplepoll_question'];
-      for($i=1;$i<=5;$i++){
+      for($i=1;$i
+	<=5;$i++){
       	$new_item['simplepoll_option_'.$i] = $item['simplepoll_option_'.$i];
       }
       	
@@ -256,13 +283,15 @@ function simplepoll_field_presave($entity_type, $entity, $field, $instance, $lan
 * Implements hook_field_load().
 */
 function simplepoll_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
-  foreach ($entities as $id => $entity) {
+  foreach ($entities as $id =>
+		$entity) {
     foreach ($items[$id] as $delta => &$item) {
       $new_item = array();
      
       $new_item['simplepoll_question'] = $item['simplepoll_question'];
 
-        for($i=1;$i<=5;$i++){
+        for($i=1;$i
+		<=5;$i++){
       		$new_item['simplepoll_option_'.$i] = $item['simplepoll_option_'.$i];
   		}
       $item = $new_item;
@@ -273,7 +302,8 @@ function simplepoll_field_load($entity_type, $entities, $field, $instances, $lan
 /*Saving votes*/
 function simplepoll_permissions(){
 	 return array(
-    'participate in polls' => array(
+    'participate in polls' =>
+			array(
       'title' => t('Participate in voting on polls'),
       'description' => t('let´s user to select a choice in polls.'),
     ),
@@ -290,21 +320,33 @@ function simplepoll_menu() {
 
 function page_simplepoll_vote_saving(){
 	print_r($_POST);
-	return array('#markup' => '<p>' . t('Simple page: The quick brown fox jumps over the lazy dog.') . '</p>');
+	return array('#markup' => '
+			<p>
+				' . t('Simple page: The quick brown fox jumps over the lazy dog.') . '
+			</p>
+			');
 }
 
 
 
-function simplepoll_votingform($form, &$form_state) {
+function simplepoll_votingform($form,&$form_state,$choiceForm,$totalPolls) {
+  foreach (array_keys($choiceForm) as $key ) {
+  	$form[$key]=$choiceForm[$key];
+  }
 
-  $form['description'] = array(
-    '#type' => 'item',
-    '#title' => t('A form with nothing but a textfield'),
+  //$form['actions'] = array('#type' => 'actions');
+  $form['#action'] = url('simplepoll');
+  $form['totalQuestion'] = array('#type' => 'hidden', '#value' => $totalPolls);
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Send'),
   );
-  // This is the first form element. It's a textfield with a label, "Name"
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-  );
-  return $form;
+ 
+  
+    return $form;
+}
+
+function tieneValor($var)
+{
+    if($var !=""){return $var;}
 }
