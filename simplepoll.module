@@ -64,10 +64,11 @@ function simplepoll_field_widget_form(&$form, &$form_state, $field, $instance, $
   // Array keys in $element correspond roughly
   // to array keys in $item, which correspond
   // roughly to columns in the database table.
-  
+   drupal_add_css(drupal_get_path('module', 'simplepoll') .'/css/simplepollbackend.css');
   $element['simplepoll_question'] = array(
     '#title' => t('Poll Title'),
     '#type' => 'textfield',
+    '#attributes' => array('class' => array('polltitle')),
     //'#required' => $required,
     '#default_value' => isset($item['simplepoll_question']) ? $item['simplepoll_question'] : '',
   );  
@@ -202,7 +203,7 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
 	  		$item['simplepoll_option_3'],
 	  		$item['simplepoll_option_4'],
 	  		$item['simplepoll_option_5']
-	  		), 'tieneValor')
+	  		), 'hasValue')
 	  	);
 
 
@@ -346,7 +347,7 @@ function simplepoll_votingform($form,&$form_state,$choiceForm,$totalPolls) {
     return $form;
 }
 
-function tieneValor($var)
+function hasValue($var)
 {
     if($var !=""){return $var;}
 }
