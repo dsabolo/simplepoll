@@ -11,49 +11,37 @@ function simplepoll_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-     /* 'vid' => array(
-        'description' => 'The current {node_revision}.vid version identifier.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),*/
 
-      'fieldname' => array(
-        'description' => 'The field for this poll.',
-        'type' => 'varchar',
-        'length' => 90,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'delta' => array(
-        'description' => 'The number of question.',
-        'type' => 'int',
+       'user' => array(
+        'description' => 'The identifier for the user',
+       // 'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-   
       ),
+      
       'question' => array(
-        'description' => 'The number of response.',
-        'type' => 'int',
-        'unsigned' => TRUE,
+        'description' => 'The question',
+        'type' => 'varchar',
+        'length' => 255,
         'not null' => TRUE,
    
       ),
-      'qty' => array(
-        'description' => 'Votes Qty',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
+       'answer' => array(
+        'description' => 'The answer.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
    
       ),
+
+    
     ),
     /*'indexes' => array(
       'node_changed' => array('changed'),
       'node_created' => array('created'),
     ),*/
     'unique keys' => array(
-      'pollquestion' => array('nid', 'fieldname','delta','question'),
+      'pollquestion' => array('nid', 'user','question'),
     ),
     /*'foreign keys' => array(
       'node_revision' => array(
