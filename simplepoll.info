@@ -1,4 +1,4 @@
 name = SimplePoll
 description = A Poll field for creates polls in node edition form.
 core = 7.x
-version = 7.18-dev
+version = 7.19-dev
