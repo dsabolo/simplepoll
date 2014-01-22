@@ -14,9 +14,9 @@ function simplepoll_schema() {
 
        'user' => array(
         'description' => 'The identifier for the user',
-       // 'type' => 'serial',
+       'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
+        'not null' => FALSE,
       ),
       
       'question' => array(
