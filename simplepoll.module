@@ -377,6 +377,6 @@ function simplepoll_validate($form, $form_state){
 
     //TODO: Mostra mensaje de salida.
 
-    return t("Thank you");
+    return t("Thanks");
   }
 }
