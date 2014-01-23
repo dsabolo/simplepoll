@@ -376,7 +376,7 @@ function simplepoll_validate($form, $form_state){
     //TODO: Exponer Data Actual.
 
     //TODO: Mostra mensaje de salida.
-
+    print_r($_POST);
     return t("Thanks");
   }
 }

@@ -37,24 +37,11 @@ function simplepoll_schema() {
 
     
     ),
-    /*'indexes' => array(
-      'node_changed' => array('changed'),
-      'node_created' => array('created'),
-    ),*/
+ 
     'unique keys' => array(
       'pollquestion' => array('nid','question', 'choice'),
     ),
-    /*'foreign keys' => array(
-      'node_revision' => array(
-        'table' => 'node_revision',
-        'columns' => array('vid' => 'vid'),
-      ),
-      'node_author' => array(
-        'table' => 'users',
-        'columns' => array('uid' => 'uid'),
-      ),
-    ),*/
-    //'primary key' => array('pollquestion'),
+
   );
 
 
@@ -79,24 +66,7 @@ $schema['simplepoll_user'] = array(
 
     
     ),
-    /*'indexes' => array(
-      'node_changed' => array('changed'),
-      'node_created' => array('created'),
-    ),*/
-    /*'unique keys' => array(
-      'pollquestion' => array('nid','question', 'choice'),
-    ),*/
-    /*'foreign keys' => array(
-      'node_revision' => array(
-        'table' => 'node_revision',
-        'columns' => array('vid' => 'vid'),
-      ),
-      'node_author' => array(
-        'table' => 'users',
-        'columns' => array('uid' => 'uid'),
-      ),
-    ),*/
-    //'primary key' => array('pollquestion'),
+ 
   );
 
 
