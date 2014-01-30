@@ -162,7 +162,7 @@ function simplepoll_field_formatter_info() {
 function simplepoll_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
  drupal_add_js(drupal_get_path('module', 'simplepoll') .'/js/simplepoll.js');
-
+drupal_add_css(drupal_get_path('module', 'simplepoll') .'/css/simplepoll.css');
   switch ($display['type']) {
   case 'simplepoll_formatter':
     $format_field = 'simplepoll_format_default_field';
@@ -371,8 +371,9 @@ function simplepoll_validate($form, $form_state){
   $error = false;
   $totalQuestion = $_POST['totalQuestion'];
   $pollNid = $_POST['pollNid'];
+
   for($i=0;$i<$totalQuestion;$i++){
-    if($_POST['choice'.$i]==""){
+    if($_POST[str_replace(' ','_',$_POST['choice'.$i])]==""){
       $error  = true;
     }
     //$choices.=$_POST['choice'.$i];
@@ -413,12 +414,45 @@ function  simplepoll_display_results($pollNid){
   //Preguntas activas del nodo
   $poll= node_load($pollNid);
   $fieldName=db_query('SELECT c.field_name FROM field_config c , field_config_instance i WHERE i.field_id=c.id AND c.module=:module',array(':module'=>'simplepoll'))->fetchField();
-
+  $out="";
   $poll = $poll->$fieldName;
-  print_r($poll['und']);
+  //$pollSubmits=db_query('SELECT * FROM simplepoll_user WHERE nid =:nid', array(':nid'=>$pollNid))->rowCount();
+  $pollSubmits=0;
+
+  if(@count($poll['und'])>0){
+    $questionNumber = 0;
+    foreach($poll['und'] as $pollQuestion){
+      $out.='<h4>'.$pollQuestion['simplepoll_question'].'</h4>';
+       $out.='<ul class="votacion">';
+      
+      //Contando los envios en base a la pregunta activa (solo lo cuento para la primera que que las posteriores tienen la misma cantidad de envios.Sistema atomico) 
+      $questionNumber ++;
+      if($questionNumber==1){
+        for($i=1;$i<=5;$i++){
+        if($pollQuestion['simplepoll_option_'.$i]!=""){     
+          $itemQty = db_query('SELECT qty FROM simplepoll_votes WHERE nid=:nid AND question=:question AND choice=:choice',array(':nid'=>$pollNid, ':question'=>$pollQuestion['simplepoll_question'],':choice'=>$pollQuestion['simplepoll_option_'.$i]))->fetchField();
+          $pollSubmits = $pollSubmits + $itemQty;
+        }
+        
+        }
+      }
+      
+
+      for($i=1;$i<=5;$i++){
+        if($pollQuestion['simplepoll_option_'.$i]!=""){
+          //$out.='<p>'.$pollQuestion['simplepoll_option_'.$i].'</p>';
+          $itemQty = db_query('SELECT qty FROM simplepoll_votes WHERE nid=:nid AND question=:question AND choice=:choice',array(':nid'=>$pollNid, ':question'=>$pollQuestion['simplepoll_question'],':choice'=>$pollQuestion['simplepoll_option_'.$i]))->fetchField();
+          $out.= '<li><div class="fl">'.$pollQuestion['simplepoll_option_'.$i].'</div><div class="fr">Votos: '.$itemQty.'</div><div class="barra" style="width:'.($itemQty*100/$pollSubmits).'%;">'.round($itemQty*100/$pollSubmits).'%</div></li>';
+          
+        }
+        
+      }
+      $out.='</ul>';
+    }
+  }
 
 
   //Resultados para cada pregunta
 
-  return "barras de colores en ".$nombreCampoEncuesta;
+  return '<div id="simplepoll_result">'.$out.'<span class="fr">'.$pollSubmits.' Envios</span></div>';
 }

@@ -1,0 +1,81 @@
+#simplepoll * {
+	font-family: sans-serif;
+}
+#simplepoll {
+	width: 350px;
+}
+#simplepoll h4 {
+	font-size: 1.3em;
+}
+
+#simplepoll .barra{
+	#simplepollbackground: #ff3019;
+	background: -moz-linear-gradient(top, #ff3019 0%, #cf0404 100%);
+	background: -webkit-linear-gradient(top, #ff3019 0%,#cf0404 100%);
+	background: linear-gradient(to bottom, #ff3019 0%,#cf0404 100%);
+	clear: both;
+	height: 15px;
+	color: white;
+	font-weight: bold;
+	text-align: right;
+	padding: 6px;
+	border-radius: 4px;
+	max-width: 356px;
+	min-width: 20px;
+}
+
+#simplepoll ul.votacion{
+	margin:0;
+	margin-bottom: 25px;
+	list-style: none;
+	padding-left: 0;
+}
+#simplepoll .votacion li{
+	padding: 8px;
+	background: #eee;
+	border-radius: 5px;
+	margin-left: 0;
+	margin-bottom: 5px;
+	border:1px solid #ddd;
+}
+#simplepoll .votacion li:hover{
+	background: white;
+}
+#simplepoll .votacion li a{
+	color: gray;
+	font-weight: bold;
+	font-size: 16px;
+}
+#simplepoll .votacion li a:hover{
+	color: black;
+}
+#simplepoll .votacion li span{
+	margin-left: 10px;
+}
+#simplepoll .votacion .fl{
+	margin-bottom: 5px;
+}
+#simplepoll .volver{
+	display: block;
+	padding-top: 15px;
+	clear: both;
+}
+#simplepoll .resultado{
+	float: left;
+	margin-left: 10px;
+	margin-top: 7px;
+	color: black;
+}
+#simplepoll a{
+	text-decoration: none;
+	color: red;
+}
+#simplepoll .fr{
+	float: right;
+}
+#simplepoll .fl,#simplepoll  .votar{
+	float: left;
+}
+#simplepoll .cf{
+	clear: both;
+}
