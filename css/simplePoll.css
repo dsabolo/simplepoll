@@ -1,15 +1,13 @@
-#simplepoll * {
-	font-family: sans-serif;
-}
+
 #simplepoll {
-	width: 350px;
+	width: 380px;
 }
 #simplepoll h4 {
 	font-size: 1.3em;
 }
 
 #simplepoll .barra{
-	#simplepollbackground: #ff3019;
+	background: #ff3019;
 	background: -moz-linear-gradient(top, #ff3019 0%, #cf0404 100%);
 	background: -webkit-linear-gradient(top, #ff3019 0%,#cf0404 100%);
 	background: linear-gradient(to bottom, #ff3019 0%,#cf0404 100%);
@@ -18,12 +16,20 @@
 	color: white;
 	font-weight: bold;
 	text-align: right;
-	padding: 6px;
+	padding: 4px;
 	border-radius: 4px;
 	max-width: 356px;
 	min-width: 20px;
+	border:1px solid #ff3019 ;
 }
 
+#simplepoll .qty0 .barra {
+	background: transparent;
+	width: 25px !important;
+	color:#222 ;
+	font-weight: normal
+
+}
 #simplepoll ul.votacion{
 	margin:0;
 	margin-bottom: 25px;
@@ -75,6 +81,7 @@
 }
 #simplepoll .fl,#simplepoll  .votar{
 	float: left;
+	font-weight: bold;
 }
 #simplepoll .cf{
 	clear: both;

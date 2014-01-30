@@ -442,7 +442,8 @@ function  simplepoll_display_results($pollNid){
         if($pollQuestion['simplepoll_option_'.$i]!=""){
           //$out.='<p>'.$pollQuestion['simplepoll_option_'.$i].'</p>';
           $itemQty = db_query('SELECT qty FROM simplepoll_votes WHERE nid=:nid AND question=:question AND choice=:choice',array(':nid'=>$pollNid, ':question'=>$pollQuestion['simplepoll_question'],':choice'=>$pollQuestion['simplepoll_option_'.$i]))->fetchField();
-          $out.= '<li><div class="fl">'.$pollQuestion['simplepoll_option_'.$i].'</div><div class="fr">Votos: '.$itemQty.'</div><div class="barra" style="width:'.($itemQty*100/$pollSubmits).'%;">'.round($itemQty*100/$pollSubmits).'%</div></li>';
+          if(empty($itemQty)){$itemQty=0;}
+          $out.= '<li class="qty'.$itemQty.'"><div class="fl">'.$pollQuestion['simplepoll_option_'.$i].'</div><div class="fr">Votos: '.$itemQty.'</div><div class="barra" style="width:'.($itemQty*100/$pollSubmits).'%;">'.round($itemQty*100/$pollSubmits).'%</div></li>';
           
         }
         
@@ -453,6 +454,7 @@ function  simplepoll_display_results($pollNid){
 
 
   //Resultados para cada pregunta
+  $envioStr= ($pollSubmits>1)?t('envios'):t('envio');
 
-  return '<div id="simplepoll_result">'.$out.'<span class="fr">'.$pollSubmits.' Envios</span></div>';
+  return '<div id="simplepoll_result">'.$out.'<span class="fr">'.$pollSubmits.' '.$envioStr.'</span></div>';
 }
