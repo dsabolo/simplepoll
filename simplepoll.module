@@ -174,15 +174,16 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
   foreach ($items as $delta => $item) {
 
      $choiceForm['choice'.$delta] = array(
-	  	'#type' => 'radios',
+	  //	$choiceForm[$item['simplepoll_question']] = array(
+      '#type' => 'radios',
 	  	'#title' => $item['simplepoll_question'],
       '#required' => true,
 	  	'#options' => array_filter(array(
-	  		$item['simplepoll_option_1'],
-	  		$item['simplepoll_option_2'],
-	  		$item['simplepoll_option_3'],
-	  		$item['simplepoll_option_4'],
-	  		$item['simplepoll_option_5']
+	  		$item['simplepoll_option_1']=>$item['simplepoll_option_1'],
+	  		$item['simplepoll_option_2']=>$item['simplepoll_option_2'],
+	  		$item['simplepoll_option_3']=>$item['simplepoll_option_3'],
+	  		$item['simplepoll_option_4']=>$item['simplepoll_option_4'],
+	  		$item['simplepoll_option_5']=>$item['simplepoll_option_5']
 	  		), 'hasValue')
 	  	);
 
@@ -193,9 +194,18 @@ function simplepoll_field_formatter_view($entity_type, $entity, $field, $instanc
     	$theForm = drupal_render($theForm);
     	//TODO: Mostrar form o 403 (Perm: participate in polls) o mensaje de ya completado.
       if(user_access('participate in polls')){
+        global $user;
+        $result = db_query('SELECT * FROM simplepoll_user WHERE nid=:nid AND user=:user', array(':nid'=>$entity->nid,':user'=>$user->uid));
+        if(($result->rowCount())<1){
+          $theContent = $theForm;
+        }
+        else {
+          $theContent = simplepoll_display_results($entity->nid);
+        }
+
         $elements[0]=array(
         '#theme' => 'simplepoll_view',
-        '#poll'=>$theForm,  
+        '#poll'=>$theContent,  
         );
       }
       else {
@@ -307,7 +317,7 @@ function simplepoll_menu() {
   }
 
 function page_simplepoll_vote_saving(){
-	print_r($_POST);
+	//print_r($_POST);
 	return array('#markup' => '
 			<p>
 				' . t('Simple page: The quick brown fox jumps over the lazy dog.') . '
@@ -318,8 +328,11 @@ function page_simplepoll_vote_saving(){
 
 
 function simplepoll_votingform($form,&$form_state,$choiceForm,$totalPolls,$nid) {
+  
   foreach (array_keys($choiceForm) as $key ) {
-  	$form[$key]=$choiceForm[$key];
+  	//$form[$key]=$choiceForm[$key];
+    $form[$key]=array('#type' => 'hidden', '#value' => $choiceForm[$key]['#title']);
+    $form[$choiceForm[$key]['#title']]=$choiceForm[$key];
   }
 
 
@@ -354,7 +367,7 @@ function simplepoll_page(){
 
 /*Ajax*/
 function simplepoll_validate($form, $form_state){
-
+  global $user;
   $error = false;
   $totalQuestion = $_POST['totalQuestion'];
   $pollNid = $_POST['pollNid'];
@@ -362,21 +375,50 @@ function simplepoll_validate($form, $form_state){
     if($_POST['choice'.$i]==""){
       $error  = true;
     }
-    $choices.=$_POST['choice'.$i];
+    //$choices.=$_POST['choice'.$i];
   }
   if($error){
-    drupal_set_message('Debes completar toda la encuesta','error');
-    
+    //drupal_set_message('Debes completar toda la encuesta','error');
     return drupal_render($form);
   }
   else {
-
     //TODO: Guardar resultados.
-
-    //TODO: Exponer Data Actual.
-
-    //TODO: Mostra mensaje de salida.
-    print_r($_POST);
-    return t("Thanks");
+      //Preguntas y sus respuestas
+      for($i=0;$i<$totalQuestion;$i++){
+        simplepoll_add_poll( $pollNid ,$user->uid,$_POST['choice'.$i], $_POST[str_replace(' ','_',$_POST['choice'.$i])]);
+      }
+    return simplepoll_display_results($pollNid);
   }
+}
+
+
+function simplepoll_add_poll($pollNid,$userID,$questionString, $answerString){
+  $result = db_query('SELECT * FROM simplepoll_user WHERE nid=:nid AND user=:user', array(':nid'=>$pollNid,':user'=>$userID));
+  if(($result->rowCount())<1){
+    db_query('INSERT INTO simplepoll_user (nid,user) VALUES (:nid,:user)',array(':nid'=>$pollNid,':user'=>$userID));
+  }
+
+
+  $votesQty = db_query('SELECT * FROM simplepoll_votes WHERE nid=:nid AND question=:question AND choice=:choice ', array(':nid'=>$pollNid,':question'=>$questionString,':choice'=>$answerString));
+  if(($votesQty->rowCount())<1){
+    db_query('INSERT INTO simplepoll_votes (nid,question,choice,qty) VALUES(:nid,:question,:choice,:qty)', array(':nid'=>$pollNid,':question'=>$questionString,':choice'=>$answerString,':qty'=>1));
+  }
+  else {
+    db_update('simplepoll_votes')->expression('qty', 'qty + 1')->condition('nid', $pollNid)->condition('question', $questionString)->condition('choice', $answerString)->execute();
+  }
+
+}
+
+function  simplepoll_display_results($pollNid){
+  //Preguntas activas del nodo
+  $poll= node_load($pollNid);
+  $fieldName=db_query('SELECT c.field_name FROM field_config c , field_config_instance i WHERE i.field_id=c.id AND c.module=:module',array(':module'=>'simplepoll'))->fetchField();
+
+  $poll = $poll->$fieldName;
+  print_r($poll['und']);
+
+
+  //Resultados para cada pregunta
+
+  return "barras de colores en ".$nombreCampoEncuesta;
 }

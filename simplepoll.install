@@ -66,6 +66,10 @@ $schema['simplepoll_user'] = array(
 
     
     ),
+    'unique keys' => array(
+      'uniqid' => array('nid','user'),
+    ),
+
  
   );
 
